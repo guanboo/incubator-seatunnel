@@ -20,8 +20,6 @@ package org.apache.seatunnel.connectors.seatunnel.druid.client;
 
 import org.apache.seatunnel.api.table.type.SeaTunnelRow;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +27,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.druid.data.input.MaxSizeSplitHintSpec;
 import org.apache.druid.data.input.impl.CsvInputFormat;
 import org.apache.druid.data.input.impl.DimensionsSpec;
@@ -58,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -107,7 +107,7 @@ public class DruidOutputFormat implements Serializable {
         this.data.append(DEFAULT_LINE_DELIMITER);
     }
 
-    public void closeOutputFormat() {
+    public <T> void closeOutputFormat() throws IOException {
         try {
             ParallelIndexIOConfig ioConfig = parallelIndexIOConfig();
             ParallelIndexTuningConfig tuningConfig = tuningConfig();
@@ -122,20 +122,21 @@ public class DruidOutputFormat implements Serializable {
             mapper.configure(SerializationFeature.INDENT_OUTPUT, false);
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             String taskJSON = mapper.writeValueAsString(indexTask);
-            JSONObject jsonObject = JSON.parseObject(taskJSON);
-            jsonObject.remove("id");
-            jsonObject.remove("groupId");
-            jsonObject.remove("resource");
-            JSONObject spec = jsonObject.getJSONObject("spec");
-            spec.remove("tuningConfig");
-            jsonObject.put("spec", spec);
-            taskJSON = jsonObject.toJSONString();
-
+            Map map = mapper.readValue(taskJSON, Map.class);
+            map.remove("id");
+            map.remove("groupId");
+            map.remove("resource");
+            String spec = mapper.writeValueAsString(map.get("spec"));
+            Map specMap = mapper.readValue(spec, Map.class);
+            specMap.remove("tuningConfig");
+            map.put("spec", mapper.readValue(mapper.writeValueAsString(specMap), Object.class));
+            taskJSON = mapper.writeValueAsString(map);
             URL url = new URL(this.coordinatorURL + "druid/indexer/v1/task");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json, text/plain, */*");
+            con.setRequestProperty("charset", "utf-8");
             con.setDoOutput(true);
             try (OutputStream os = con.getOutputStream()) {
                 byte[] input = taskJSON.getBytes(StandardCharsets.UTF_8);
@@ -149,8 +150,8 @@ public class DruidOutputFormat implements Serializable {
                 }
                 LOGGER.info("Druid write task has been sent, and the response is {}", response.toString());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException se) {
+            throw new IOException("Couldn't write data - " + ExceptionUtils.getMessage(se), se);
         }
     }
 

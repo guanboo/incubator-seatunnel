@@ -34,6 +34,7 @@ import org.apache.seatunnel.connectors.seatunnel.druid.config.DruidSourceOptions
 import org.apache.seatunnel.shade.com.typesafe.config.Config;
 
 import com.google.auto.service.AutoService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,8 @@ public class DruidSource extends AbstractSingleSplitSource<SeaTunnelRow> {
             druidSourceOptions = new DruidSourceOptions(pluginConfig);
             druidInputFormat = new DruidInputFormat(druidSourceOptions);
             this.rowTypeInfo = druidInputFormat.getRowTypeInfo();
-        } catch (Exception e) {
-            throw new PrepareFailException("Druid", PluginType.SOURCE, e.toString());
+        } catch (Exception se) {
+            throw new PrepareFailException("Druid", PluginType.SOURCE,  ExceptionUtils.getMessage(se));
         }
     }
 

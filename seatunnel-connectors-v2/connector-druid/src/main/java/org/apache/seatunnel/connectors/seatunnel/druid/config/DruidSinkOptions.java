@@ -43,9 +43,9 @@ public class DruidSinkOptions implements Serializable {
     private int parallelism;
 
     public DruidSinkOptions(Config pluginConfig) {
-        this.coordinatorURL = pluginConfig.getString(DruidSinkConfig.COORDINATOR_URL);
-        this.datasource = pluginConfig.getString(DruidSinkConfig.DATASOURCE);
-        this.columns = pluginConfig.getStringList(DruidSinkConfig.COLUMNS);
+        this.coordinatorURL = pluginConfig.hasPath(DruidSinkConfig.COORDINATOR_URL) ? pluginConfig.getString(DruidSinkConfig.COORDINATOR_URL) : null;
+        this.datasource = pluginConfig.hasPath(DruidSinkConfig.DATASOURCE) ? pluginConfig.getString(DruidSinkConfig.DATASOURCE) : null;
+        this.columns = pluginConfig.hasPath(DruidSinkConfig.COLUMNS) ? pluginConfig.getStringList(DruidSinkConfig.COLUMNS) : null;
         this.timestampColumn = pluginConfig.hasPath(DruidSinkConfig.TIMESTAMP_COLUMN) ? pluginConfig.getString(DruidSinkConfig.TIMESTAMP_COLUMN) : null;
         this.timestampFormat = pluginConfig.hasPath(DruidSinkConfig.TIMESTAMP_FORMAT) ? pluginConfig.getString(DruidSinkConfig.TIMESTAMP_FORMAT) : null;
         this.timestampMissingValue = pluginConfig.hasPath(DruidSinkConfig.TIMESTAMP_MISSING_VALUE) ? pluginConfig.getString(DruidSinkConfig.TIMESTAMP_MISSING_VALUE) : null;

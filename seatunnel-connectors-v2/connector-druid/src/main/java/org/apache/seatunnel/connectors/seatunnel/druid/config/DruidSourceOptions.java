@@ -41,8 +41,8 @@ public class DruidSourceOptions implements Serializable {
     private Integer parallelism;
 
     public DruidSourceOptions(Config pluginConfig) {
-        this.url = pluginConfig.getString(DruidSourceConfig.URL);
-        this.datasource = pluginConfig.getString(DruidSourceConfig.DATASOURCE);
+        this.url = pluginConfig.hasPath(DruidSourceConfig.URL) ? pluginConfig.getString(DruidSourceConfig.URL) : null;
+        this.datasource = pluginConfig.hasPath(DruidSourceConfig.DATASOURCE) ? pluginConfig.getString(DruidSourceConfig.DATASOURCE) : null;
         this.columns = pluginConfig.hasPath(DruidSourceConfig.COLUMNS) ? pluginConfig.getStringList(DruidSourceConfig.COLUMNS) : null;
         this.startTimestamp = pluginConfig.hasPath(DruidSourceConfig.START_TIMESTAMP) ? pluginConfig.getString(DruidSourceConfig.START_TIMESTAMP) : null;
         this.endTimestamp = pluginConfig.hasPath(DruidSourceConfig.END_TIMESTAMP) ? pluginConfig.getString(DruidSourceConfig.END_TIMESTAMP) : null;

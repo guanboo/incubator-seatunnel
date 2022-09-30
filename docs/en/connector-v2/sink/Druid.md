@@ -4,37 +4,47 @@
 
 ## Description
 
-Write data to Apache Druid.
+Used to write data to Druid.
 
+## Key features
+
+- [ ] [exactly-once](../../concept/connector-v2-features.md)
+
+The Druid sink plug-in can achieve accuracy once by implementing idempotent writing, and needs to cooperate with aggregatingmergetree and other engines that support deduplication.
+
+- [ ] [schema projection](../../concept/connector-v2-features.md)
+
+
+:::
 
 ## Options
 
 | name                    | type     | required | default value |
 | ----------------------- | -------- | -------- | ------------- |
-| coordinator_url         | `String` | yes      | -             |
-| datasource              | `String` | yes      | -             |
-| columns                 | `List<String>` | yes| __time        |
-| timestamp_column        | `String` | no       | timestamp     |
-| timestamp_format        | `String` | no       | auto          |
-| timestamp_missing_value | `String` | no       | -             |
+| coordinator_url         | string | yes      | -             |
+| datasource              | string | yes      | -             |
+| columns                 | List<string> | yes| -             |
+| timestamp_column        | string | no       | timestamp     |
+| timestamp_format        | string | no       | auto          |
+| timestamp_missing_value | string| no       | -             |
 
-### coordinator_url [`String`]
+### coordinator_url [string]
 
-The URL of Coordinator service in Apache Druid.
+`Druid` cluster coordinator address, the format is `host:port` ,Such as `"host:8081"` .
 
-### datasource [`String`]
+### datasource [string]
 
-The DataSource name in Apache Druid.
+The `Druid` datasource
 
-### columns [`List<String>`]
+### columns [array]
 
-These columns that you want to write of Druid.
+The data field that needs to be output to `Druid` , if not configured, it will be automatically adapted according to the sink table `schema` .
 
-### timestamp_column [`String`]
+### timestamp_column [string]
 
 The timestamp column name in Apache Druid, the default value is `timestamp`.
 
-### timestamp_format [`String`]
+### timestamp_format [string]
 
 The timestamp format in Apache Druid, the default value is `auto`, it could be:
 
@@ -58,11 +68,9 @@ The timestamp format in Apache Druid, the default value is `auto`, it could be:
 
 - any [Joda DateTimeFormat](http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html) string
 
-### timestamp_missing_value [`String`]
+### timestamp_missing_value [string]
 
 The timestamp missing value in Apache Druid, which is used for input records that have a null or missing timestamp. The value of `timestamp_missing_value` should be in ISO 8601 format, for example `"2022-02-02T02:02:02.222"`.
-
-## Example
 
 ### Simple
 
@@ -98,4 +106,3 @@ DruidSink {
   columns = ["flags","page"]
 }
 ```
-
