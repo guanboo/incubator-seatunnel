@@ -394,15 +394,15 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.druid</groupId>
-                <artifactId>druid-core</artifactId>
-                <version>${druid-core.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.calcite.avatica</groupId>
                 <artifactId>avatica-core</artifactId>
                 <version>${avatica-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.druid</groupId>
+                <artifactId>druid-core</artifactId>
+                <version>${druid-core.version}</version>
             </dependency>
 
         </dependencies>
